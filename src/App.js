@@ -13,7 +13,7 @@ const App = () => {
       <div>
         <Title/>
         <Content/>
-        <Input/>
+        <Wrapper/>
       </div>
     </div>
   </Context.Provider>
@@ -29,7 +29,7 @@ const Content = () => {
   return <div className="content">大家好，我是: {appState.user.name}</div>
 }
 
-const changeState = (state, {type, payload}) => {
+const reducer = (state, {type, payload}) => {
   if (type === "updateUser") {
     return {
       ...state,
@@ -42,15 +42,22 @@ const changeState = (state, {type, payload}) => {
     return state
   }
 }
-const Input = () => {
+
+const Wrapper = () => {
   const {appState, setAppState} = useContext(Context)
+  const dispatch = (action) => {
+    setAppState(reducer(appState, action))
+  }
+  return <Input dispatch={dispatch} state={appState}/>
+}
+const Input = (props) => {
+  const {dispatch, state} = props
   const onChange = (e) => {
-    // appState.user.name = e.target.value
-    setAppState(changeState(appState, {type: "updateUser", payload: {name: e.target.value}}))
+    dispatch({type: "updateUser", payload: {name: e.target.value}})
   }
   return <div className="input">
     <div className="label">请输入：</div>
-    <input type="text" onChange={onChange} value={appState.user.name}/>
+    <input type="text" onChange={onChange} value={state.user.name}/>
   </div>
 }
 
