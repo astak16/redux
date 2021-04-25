@@ -1,0 +1,27 @@
+#root{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.wrapper{
+  border: 1px solid gray;
+  border-radius: 6px;
+  width: 300px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.title{
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+.input{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
