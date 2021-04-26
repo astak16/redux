@@ -13,7 +13,7 @@ const App = () => {
       <div>
         <Title/>
         <Content/>
-        <Wrapper/>
+        <Input/>
       </div>
     </div>
   </Context.Provider>
@@ -43,14 +43,17 @@ const reducer = (state, {type, payload}) => {
   }
 }
 
-const Wrapper = () => {
-  const {appState, setAppState} = useContext(Context)
-  const dispatch = (action) => {
-    setAppState(reducer(appState, action))
+const connect = (Component) => {
+  return (props) => {
+    const {appState, setAppState} = useContext(Context)
+    const dispatch = (action) => {
+      setAppState(reducer(appState, action))
+    }
+    return <Component dispatch={dispatch} state={appState} {...props}/>
   }
-  return <Input dispatch={dispatch} state={appState}/>
 }
-const Input = (props) => {
+
+const Input = connect((props) => {
   const {dispatch, state} = props
   const onChange = (e) => {
     dispatch({type: "updateUser", payload: {name: e.target.value}})
@@ -59,6 +62,6 @@ const Input = (props) => {
     <div className="label">请输入：</div>
     <input type="text" onChange={onChange} value={state.user.name}/>
   </div>
-}
+})
 
 export default App;
