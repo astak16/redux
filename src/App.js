@@ -1,14 +1,25 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import './App.css';
 
 const Context = React.createContext(null)
 
+const store = {
+  state: {user: {name: "uccs"}},
+  setState(newState) {
+    store.state = newState
+    store.listeners.map((listener) => listener(store.state))
+  },
+  listeners: [],
+  subscribe(fn) {
+    store.listeners.push(fn)
+    return () => {
+      const index = store.listeners.indexOf(fn)
+      store.listeners.splice(index, 1)
+    }
+  }
+}
 const App = () => {
-  const [appState, setAppState] = useState({
-    user: {name: "uccs"}
-  })
-  const contextValue = {appState, setAppState}
-  return <Context.Provider value={contextValue}>
+  return <Context.Provider value={store}>
     <div className="wrapper">
       <div>
         <Title/>
@@ -21,12 +32,8 @@ const App = () => {
 
 
 const Title = () => {
+  console.log("title 渲染了");
   return <div className="title">手写 redux</div>
-}
-
-const Content = () => {
-  const {appState} = useContext(Context)
-  return <div className="content">大家好，我是: {appState.user.name}</div>
 }
 
 const reducer = (state, {type, payload}) => {
@@ -45,15 +52,27 @@ const reducer = (state, {type, payload}) => {
 
 const connect = (Component) => {
   return (props) => {
-    const {appState, setAppState} = useContext(Context)
+    const {state, setState} = useContext(Context)
+    const [, update] = useState({})
+    useEffect(() => {
+      store.subscribe(() => {
+        update({})
+      })
+    }, [])
     const dispatch = (action) => {
-      setAppState(reducer(appState, action))
+      setState(reducer(state, action))
     }
-    return <Component dispatch={dispatch} state={appState} {...props}/>
+    return <Component dispatch={dispatch} state={state} {...props}/>
   }
 }
 
+const Content = connect(({state}) => {
+  console.log("content 渲染了");
+  return <div className="content">大家好，我是: {state.user.name}</div>
+})
+
 const Input = connect((props) => {
+  console.log("input 渲染了");
   const {dispatch, state} = props
   const onChange = (e) => {
     dispatch({type: "updateUser", payload: {name: e.target.value}})
