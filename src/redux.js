@@ -18,10 +18,11 @@ export const store = {
 
 export const Context = React.createContext(null)
 
-export const connect = (Component) => {
+export const connect = (selector) => (Component) => {
   return (props) => {
     const {state, setState} = useContext(Context)
     const [, update] = useState({})
+    const data = selector ? selector(state) : {state}
     useEffect(() => {
       store.subscribe(() => {
         update({})
@@ -30,7 +31,7 @@ export const connect = (Component) => {
     const dispatch = (action) => {
       setState(reducer(state, action))
     }
-    return <Component dispatch={dispatch} state={state} {...props}/>
+    return <Component dispatch={dispatch} {...data} {...props}/>
   }
 }
 

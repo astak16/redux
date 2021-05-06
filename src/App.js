@@ -20,12 +20,14 @@ const Title = () => {
   return <div className="title">手写 redux</div>
 }
 
-const Content = connect(({state}) => {
+const Content = connect(state => {
+  return {user: state.user}
+})(({user}) => {
   console.log("content 渲染了");
-  return <div className="content">大家好，我是: {state.user.name}</div>
+  return <div className="content">大家好，我是: {user.name}</div>
 })
 
-const Input = connect((props) => {
+const Input = connect()((props) => {
   console.log("input 渲染了");
   const {dispatch, state} = props
   const onChange = (e) => {
