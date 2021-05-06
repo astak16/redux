@@ -1,23 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import './App.css';
+import {connect, Context, store} from "./redux";
 
-const Context = React.createContext(null)
-
-const store = {
-  state: {user: {name: "uccs"}},
-  setState(newState) {
-    store.state = newState
-    store.listeners.map((listener) => listener(store.state))
-  },
-  listeners: [],
-  subscribe(fn) {
-    store.listeners.push(fn)
-    return () => {
-      const index = store.listeners.indexOf(fn)
-      store.listeners.splice(index, 1)
-    }
-  }
-}
 const App = () => {
   return <Context.Provider value={store}>
     <div className="wrapper">
@@ -34,36 +18,6 @@ const App = () => {
 const Title = () => {
   console.log("title 渲染了");
   return <div className="title">手写 redux</div>
-}
-
-const reducer = (state, {type, payload}) => {
-  if (type === "updateUser") {
-    return {
-      ...state,
-      user: {
-        ...state.user,
-        ...payload
-      }
-    }
-  } else {
-    return state
-  }
-}
-
-const connect = (Component) => {
-  return (props) => {
-    const {state, setState} = useContext(Context)
-    const [, update] = useState({})
-    useEffect(() => {
-      store.subscribe(() => {
-        update({})
-      })
-    }, [])
-    const dispatch = (action) => {
-      setState(reducer(state, action))
-    }
-    return <Component dispatch={dispatch} state={state} {...props}/>
-  }
 }
 
 const Content = connect(({state}) => {
