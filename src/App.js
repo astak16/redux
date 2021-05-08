@@ -9,6 +9,7 @@ const App = () => {
         <Title/>
         <Content/>
         <Input/>
+        <Group/>
       </div>
     </div>
   </Context.Provider>
@@ -37,6 +38,13 @@ const Input = connect()((props) => {
     <div className="label">请输入：</div>
     <input type="text" onChange={onChange} value={state.user.name}/>
   </div>
+})
+
+const Group = connect(state => {
+  return {group: state.group}
+})(({group}) => {
+  console.log("group 渲染了")
+  return <div>我是：{group.name}</div>
 })
 
 export default App;
