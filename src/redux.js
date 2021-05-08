@@ -31,11 +31,15 @@ const changed = (oldState, newState) => {
   return changed
 }
 
-export const connect = (selector) => (Component) => {
+export const connect = (selector, mapDispatchToProps) => (Component) => {
   return (props) => {
     const {state, setState} = useContext(Context)
     const [, update] = useState({})
+    const dispatch = (action) => {
+      setState(reducer(state, action))
+    }
     const data = selector ? selector(state) : {state}
+    const dispatchers = mapDispatchToProps ? mapDispatchToProps(dispatch) : {dispatch}
     useEffect(() => {
       return store.subscribe(() => {
         const newData = selector ? selector(store.state) : {state: store.state}
@@ -45,10 +49,8 @@ export const connect = (selector) => (Component) => {
         }
       })
     }, [selector])
-    const dispatch = (action) => {
-      setState(reducer(state, action))
-    }
-    return <Component dispatch={dispatch} {...data} {...props}/>
+
+    return <Component {...dispatchers} {...data} {...props}/>
   }
 }
 

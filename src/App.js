@@ -28,11 +28,17 @@ const Content = connect(state => {
   return <div className="content">大家好，我是: {user.name}</div>
 })
 
-const Input = connect()((props) => {
+const Input = connect(null, (dispatch) => {
+  return {
+    updateUser: (attrs) => {
+      dispatch({type: "updateUser", payload: attrs})
+    }
+  }
+})((props) => {
   console.log("input 渲染了");
-  const {dispatch, state} = props
+  const {updateUser, state} = props
   const onChange = (e) => {
-    dispatch({type: "updateUser", payload: {name: e.target.value}})
+    updateUser({name: e.target.value})
   }
   return <div className="input">
     <div className="label">请输入：</div>
