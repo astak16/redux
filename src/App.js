@@ -21,28 +21,33 @@ const Title = () => {
   return <div className="title">手写 redux</div>
 }
 
-const Content = connect(state => {
+const userSelector = state => {
   return {user: state.user}
-})(({user}) => {
-  console.log("content 渲染了");
-  return <div className="content">大家好，我是: {user.name}</div>
-})
+}
 
-const Input = connect(null, (dispatch) => {
+const userDispatch = dispatch => {
   return {
     updateUser: (attrs) => {
       dispatch({type: "updateUser", payload: attrs})
     }
   }
-})((props) => {
+}
+const connectToUser = connect(userSelector, userDispatch)
+
+const Content = connectToUser(({user}) => {
+  console.log("content 渲染了");
+  return <div className="content">大家好，我是: {user.name}</div>
+})
+
+const Input = connectToUser((props) => {
   console.log("input 渲染了");
-  const {updateUser, state} = props
+  const {updateUser, user} = props
   const onChange = (e) => {
     updateUser({name: e.target.value})
   }
   return <div className="input">
     <div className="label">请输入：</div>
-    <input type="text" onChange={onChange} value={state.user.name}/>
+    <input type="text" onChange={onChange} value={user.name}/>
   </div>
 })
 
