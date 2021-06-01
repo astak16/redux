@@ -1,29 +1,34 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+
+let state = undefined
+let reducer = undefined
+let listeners = []
+
+const setState = (newState) => {
+  state = newState
+  listeners.map((listener) => listener(state))
+}
 
 const store = {
-  state: undefined,
-  reducer: undefined,
-  setState(newState) {
-    store.state = newState
-    store.listeners.map((listener) => listener(store.state))
+  getState() {
+    return state
   },
-  listeners: [],
+  dispatch(action) {
+    setState(reducer(state, action))
+  },
   subscribe(fn) {
-    store.listeners.push(fn)
+    listeners.push(fn)
     return () => {
-      const index = store.listeners.indexOf(fn)
-      store.listeners.splice(index, 1)
+      const index = listeners.indexOf(fn)
+      listeners.splice(index, 1)
     }
   }
 }
 
-export const createStore = (reducer, initState) => {
-  console.log(reducer)
-  if (initState)
-    store.state = initState
-  else
-    store.state = reducer.state
-  store.reducer = reducer
+const dispatch = store.dispatch
+export const createStore = (_reducer, initState) => {
+  state = initState
+  reducer = _reducer
   return store
 }
 
@@ -41,16 +46,14 @@ const changed = (oldState, newState) => {
 
 export const connect = (selector, mapDispatchToProps) => (Component) => {
   return (props) => {
-    const {state, setState} = useContext(Context)
+    // const {setState} = useContext(Context)
     const [, update] = useState({})
-    const dispatch = (action) => {
-      setState(store.reducer(state, action))
-    }
+
     const data = selector ? selector(state) : {state}
     const dispatchers = mapDispatchToProps ? mapDispatchToProps(dispatch) : {dispatch}
     useEffect(() => {
       return store.subscribe(() => {
-        const newData = selector ? selector(store.state) : {state: store.state}
+        const newData = selector ? selector(state) : {state}
         if (changed(data, newData)) {
           console.log("update")
           update({})
