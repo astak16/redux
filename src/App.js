@@ -1,9 +1,28 @@
-import React, {useContext, useEffect, useState} from "react";
+import React from "react";
 import './App.css';
-import {connect, Context, store} from "./redux";
+import {connect, createStore, Provider} from "./redux";
+
+const reducer = (state, {type, payload}) => {
+  if (type === "updateUser") {
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        ...payload
+      }
+    }
+  } else {
+    return state
+  }
+}
+
+const store = createStore(reducer, {
+  user: {name: "uccs"},
+  group: {name: "前端组"},
+})
 
 const App = () => {
-  return <Context.Provider value={store}>
+  return <Provider store={store}>
     <div className="wrapper">
       <div>
         <Title/>
@@ -12,7 +31,7 @@ const App = () => {
         <Group/>
       </div>
     </div>
-  </Context.Provider>
+  </Provider>
 }
 
 

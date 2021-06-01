@@ -1,10 +1,8 @@
 import React, {useContext, useEffect, useState} from "react";
 
-export const store = {
-  state: {
-    user: {name: "uccs"},
-    group: {name: "前端组"},
-  },
+const store = {
+  state: undefined,
+  reducer: undefined,
   setState(newState) {
     store.state = newState
     store.listeners.map((listener) => listener(store.state))
@@ -17,6 +15,16 @@ export const store = {
       store.listeners.splice(index, 1)
     }
   }
+}
+
+export const createStore = (reducer, initState) => {
+  console.log(reducer)
+  if (initState)
+    store.state = initState
+  else
+    store.state = reducer.state
+  store.reducer = reducer
+  return store
 }
 
 export const Context = React.createContext(null)
@@ -36,7 +44,7 @@ export const connect = (selector, mapDispatchToProps) => (Component) => {
     const {state, setState} = useContext(Context)
     const [, update] = useState({})
     const dispatch = (action) => {
-      setState(reducer(state, action))
+      setState(store.reducer(state, action))
     }
     const data = selector ? selector(state) : {state}
     const dispatchers = mapDispatchToProps ? mapDispatchToProps(dispatch) : {dispatch}
@@ -54,16 +62,10 @@ export const connect = (selector, mapDispatchToProps) => (Component) => {
   }
 }
 
-const reducer = (state, {type, payload}) => {
-  if (type === "updateUser") {
-    return {
-      ...state,
-      user: {
-        ...state.user,
-        ...payload
-      }
-    }
-  } else {
-    return state
-  }
+export const Provider = ({store, children}) => {
+  return (
+    <Context.Provider value={store}>
+      {children}
+    </Context.Provider>
+  )
 }
